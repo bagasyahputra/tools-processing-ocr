@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Visa Application</title>
+</head>
+
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+  <form 
+    action="http://localhost:5678/webhook-test/35928f50-0041-4dd5-8429-b961a62bfb02" 
+    method="POST" 
+    enctype="multipart/form-data"
+    class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-lg space-y-6"
+  >
+
+    <h2 class="text-2xl font-semibold text-gray-800 text-center">
+      Visa Application Form
+    </h2>
+    <div>
+      <label class="block text-sm font-medium text-gray-600 mb-2">
+        Surat ditujukan kepada:
+      </label>
+      <input 
+        type="text"
+        name="addressed_to"
+        placeholder="Contoh: Direkotrakat Jenderal Imigrasi"
+        required
+        class="w-full border border-gray-300 rounded-xl p-3 focus:ring-2 focus:ring-blue-500"
+      />
+    </div>
+    <div 
+      id="dropzone"
+      class="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center cursor-pointer hover:border-blue-500 transition"
+    >
+      <p class="text-gray-500">Drag & drop passport here or click to upload</p>
+      <input 
+        type="file" 
+        name="passport_file"
+        id="fileInput"
+        accept="image/*"
+        required
+        class="hidden"
+      />
+      <img id="preview" class="mt-4 mx-auto hidden max-h-40 rounded-lg" />
+    </div>
+
+    <!-- Visa Type -->
+    <div>
+      <label class="block text-sm font-medium text-gray-600 mb-2">
+        Visa Type
+      </label>
+      <select 
+        name="visa_type"
+        required
+        class="w-full border border-gray-300 rounded-xl p-3 focus:ring-2 focus:ring-blue-500"
+      >
+        <option value="">Select Visa Type</option>
+        <option value="Single Entry C14">Single Entry C14</option>
+        <option value="Multiple Entry C14">Multiple Entry C14</option>
+      </select>
+    </div>
+    
+    <div>
+      <label class="block text-sm font-medium text-gray-600 mb-2">
+        Alamat di Indonesia
+      </label>
+      <input 
+        type="text"
+        name="alamat_indo"
+        placeholder="Contoh: Jl. Sudirman No. 123, Jakarta"
+        required
+        class="w-full border border-gray-300 rounded-xl p-3 focus:ring-2 focus:ring-blue-500"
+      />
+    </div>
+
+    <div class="space-y-3">
+      <label class="block text-sm font-medium text-gray-600 mb-2">
+        Dokumen Tambahan (Checklist)
+      </label>
+      
+      <div class="flex items-center space-x-3">
+        <input 
+          type="checkbox" 
+          id="insurance" 
+          name="options[]" 
+          value="Health Insurance"
+          class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+        />
+        <label for="insurance" class="text-sm text-gray-700">Pas Foto</label>
+      </div>
+      <div class="flex items-center space-x-3">
+        <input 
+          type="checkbox" 
+          id="insurance" 
+          name="options[]" 
+          value="Health Insurance"
+          class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+        />
+        <label for="insurance" class="text-sm text-gray-700">Surat Permohonan</label>
+      </div>
+      <div class="flex items-center space-x-3">
+        <input 
+          type="checkbox" 
+          id="insurance" 
+          name="options[]" 
+          value="Health Insurance"
+          class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+        />
+        <label for="insurance" class="text-sm text-gray-700">Memiliki Asuransi Kesehatan</label>
+      </div>
+
+      <div class="flex items-center space-x-3">
+        <input 
+          type="checkbox" 
+          id="bank_statement" 
+          name="options[]" 
+          value="Bank Statement"
+          class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+        />
+        <label for="bank_statement" class="text-sm text-gray-700">Melampirkan Rekening Koran (3 Bulan Terakhir)</label>
+      </div>
+    </div>
+
+    <!-- Submit -->
+    <button 
+      type="submit"
+      class="w-full bg-blue-600 text-white py-3 rounded-xl font-medium hover:bg-blue-700 transition"
+    >
+      Submit Application
+    </button>
+
+  </form>
+
+  <script>
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('fileInput');
+    const preview = document.getElementById('preview');
+
+    dropzone.addEventListener('click', () => fileInput.click());
+
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        preview.src = URL.createObjectURL(file);
+        preview.classList.remove('hidden');
+      }
+    });
+
+    dropzone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropzone.classList.add('border-blue-500');
+    });
+
+    dropzone.addEventListener('dragleave', () => {
+      dropzone.classList.remove('border-blue-500');
+    });
+
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('border-blue-500');
+
+      const file = e.dataTransfer.files[0];
+      fileInput.files = e.dataTransfer.files;
+
+      if (file) {
+        preview.src = URL.createObjectURL(file);
+        preview.classList.remove('hidden');
+      }
+    });
+
+
+    const form = document.querySelector('form');
+const submitBtn = form.querySelector('button');
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const originalText = submitBtn.innerText;
+  submitBtn.innerText = "Processing AI & Generating Files... Please wait";
+  submitBtn.disabled = true;
+  submitBtn.classList.replace('bg-blue-600', 'bg-gray-400');
+
+  const formData = new FormData(form);
+
+  try {
+    const response = await fetch(form.action, {
+      method: 'POST',
+      body: formData
+    });
+
+    if (!response.ok) throw new Error('Gagal memproses visa');
+
+    const blob = await response.blob();
+    
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Visa_Application.zip`;
+    document.body.appendChild(a);
+    a.click();
+    
+    window.URL.revokeObjectURL(url);
+    alert('Success! Your visa documents have been generated.');
+
+  } catch (error) {
+    console.error(error);
+    alert('Error: ' + error.message);
+  } finally {
+    submitBtn.innerText = originalText;
+    submitBtn.disabled = false;
+    submitBtn.classList.replace('bg-gray-400', 'bg-blue-600');
+  }
+});
+  </script>
+
+</body>
+</html>
