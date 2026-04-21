@@ -179,9 +179,21 @@ form.addEventListener('submit', async (e) => {
   e.preventDefault();
 
   const originalText = submitBtn.innerText;
-  submitBtn.innerText = "Processing AI & Generating Files... Please wait";
   submitBtn.disabled = true;
   submitBtn.classList.replace('bg-blue-600', 'bg-gray-400');
+
+  let timeLeft = 40;
+  submitBtn.innerText = `Generating Files... ${timeLeft}s`;
+  
+  const countdownInterval = setInterval(() => {
+    timeLeft--;
+    if (timeLeft > 0) {
+      submitBtn.innerText = `Generating Files... ${timeLeft}s`;
+    } else {
+      timeLeft = 35; // Reset countdown if fetch hasn't finished yet
+      submitBtn.innerText = `Generating Files... ${timeLeft}s`;
+    }
+  }, 1000);
 
   const formData = new FormData(form);
 
@@ -209,6 +221,7 @@ form.addEventListener('submit', async (e) => {
     console.error(error);
     alert('Error: ' + error.message);
   } finally {
+    clearInterval(countdownInterval);
     submitBtn.innerText = originalText;
     submitBtn.disabled = false;
     submitBtn.classList.replace('bg-gray-400', 'bg-blue-600');
