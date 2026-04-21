@@ -10,7 +10,7 @@
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
 
   <form 
-    action="http://localhost:5678/webhook-test/35928f50-0041-4dd5-8429-b961a62bfb02" 
+    action="http://localhost:5678/webhook/35928f50-0041-4dd5-8429-b961a62bfb02" 
     method="POST" 
     enctype="multipart/form-data"
     class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-lg space-y-6"
@@ -201,7 +201,7 @@ form.addEventListener('submit', async (e) => {
     a.download = `Visa_Application.zip`;
     document.body.appendChild(a);
     a.click();
-    
+
     window.URL.revokeObjectURL(url);
     alert('Success! Your visa documents have been generated.');
 
