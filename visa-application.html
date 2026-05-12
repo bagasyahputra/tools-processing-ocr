@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -47,7 +47,7 @@
       <img id="preview" class="mt-4 mx-auto hidden max-h-40 rounded-lg" />
     </div>
 
-    <!-- Visa Type -->
+  
     <div>
       <label class="block text-sm font-medium text-gray-600 mb-2">
         Visa Type
@@ -60,6 +60,7 @@
         <option value="">Select Visa Type</option>
         <option value="Single Entry C14">Single Entry C14</option>
         <option value="Multiple Entry C14">Multiple Entry C14</option>
+        <option value="Single Entry Exhibition Visa C11">Single Entry Exhibitor Visa C11</option>
       </select>
     </div>
     
@@ -76,55 +77,7 @@
       />
     </div>
 
-    <!-- <div class="space-y-3">
-      <label class="block text-sm font-medium text-gray-600 mb-2">
-        Dokumen Tambahan (Checklist)
-      </label>
-      
-      <div class="flex items-center space-x-3">
-        <input 
-          type="checkbox" 
-          id="insurance" 
-          name="options[]" 
-          value="Health Insurance"
-          class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-        />
-        <label for="insurance" class="text-sm text-gray-700">Pas Foto</label>
-      </div>
-      <div class="flex items-center space-x-3">
-        <input 
-          type="checkbox" 
-          id="insurance" 
-          name="options[]" 
-          value="Health Insurance"
-          class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-        />
-        <label for="insurance" class="text-sm text-gray-700">Surat Permohonan</label>
-      </div>
-      <div class="flex items-center space-x-3">
-        <input 
-          type="checkbox" 
-          id="insurance" 
-          name="options[]" 
-          value="Health Insurance"
-          class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-        />
-        <label for="insurance" class="text-sm text-gray-700">Memiliki Asuransi Kesehatan</label>
-      </div>
-
-      <div class="flex items-center space-x-3">
-        <input 
-          type="checkbox" 
-          id="bank_statement" 
-          name="options[]" 
-          value="Bank Statement"
-          class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-        />
-        <label for="bank_statement" class="text-sm text-gray-700">Melampirkan Rekening Koran (3 Bulan Terakhir)</label>
-      </div>
-    </div> -->
-
-    <!-- Submit -->
+  
     <button 
       type="submit"
       class="w-full bg-blue-600 text-white py-3 rounded-xl font-medium hover:bg-blue-700 transition"
@@ -227,6 +180,200 @@ form.addEventListener('submit', async (e) => {
     submitBtn.classList.replace('bg-gray-400', 'bg-blue-600');
   }
 });
+  </script>
+
+</body>
+</html> -->
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Visa Application - Batch Processing</title>
+</head>
+
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+
+  <form 
+    action="https://n8n.visaloka.com/webhook/terima-zip-paspor" 
+    method="POST" 
+    enctype="multipart/form-data"
+    class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-lg space-y-6"
+  >
+
+    <h2 class="text-2xl font-semibold text-gray-800 text-center">
+      Tools OCR Passport (Batch ZIP)
+    </h2>
+
+    <div>
+      <label class="block text-sm font-medium text-gray-600 mb-2">
+        Surat ditujukan kepada:
+      </label>
+      <input 
+        type="text"
+        name="addressed_to"
+        placeholder="Contoh: Direktorat Jenderal Imigrasi"
+        required
+        class="w-full border border-gray-300 rounded-xl p-3 focus:ring-2 focus:ring-blue-500"
+      />
+    </div>
+
+    <div 
+      id="dropzone"
+      class="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center cursor-pointer hover:border-blue-500 transition relative"
+    >
+      <div id="dropzone-text">
+        <p class="text-gray-500 font-medium">Upload ZIP File Only</p>
+        <p class="text-xs text-gray-400 mt-1">Isi ZIP: 10-20 foto passport</p>
+      </div>
+      
+      <input 
+        type="file" 
+        name="passport_file"
+        id="fileInput"
+        accept=".zip"
+        required
+        class="hidden"
+      />
+
+      <div id="file-info" class="mt-4 hidden p-3 bg-blue-50 rounded-lg border border-blue-100">
+        <p id="file-name" class="text-sm text-blue-700 font-mono truncate"></p>
+      </div>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-gray-600 mb-2">
+        Visa Type
+      </label>
+      <select 
+        name="visa_type"
+        required
+        class="w-full border border-gray-300 rounded-xl p-3 focus:ring-2 focus:ring-blue-500"
+      >
+        <option value="">Select Visa Type</option>
+        <option value="Single Entry C14">Single Entry C14</option>
+        <option value="Multiple Entry C14">Multiple Entry C14</option>
+        <option value="Single Entry Exhibition Visa C11">Single Entry Exhibitor Visa C11</option>
+      </select>
+    </div>
+    
+    <div>
+      <label class="block text-sm font-medium text-gray-600 mb-2">
+        Alamat di Indonesia
+      </label>
+      <input 
+        type="text"
+        name="alamat_indo"
+        placeholder="Contoh: Jl. Sudirman No. 123, Jakarta"
+        required
+        class="w-full border border-gray-300 rounded-xl p-3 focus:ring-2 focus:ring-blue-500"
+      />
+    </div>
+
+    <button 
+      type="submit"
+      class="w-full bg-blue-600 text-white py-3 rounded-xl font-medium hover:bg-blue-700 transition"
+    >
+      Submit & Process All
+    </button>
+
+  </form>
+
+  <script>
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('fileInput');
+    const fileInfo = document.getElementById('file-info');
+    const fileNameDisplay = document.getElementById('file-name');
+    const dropzoneText = document.getElementById('dropzone-text');
+
+    dropzone.addEventListener('click', () => fileInput.click());
+
+    function handleFile(file) {
+      if (file && file.name.endsWith('.zip')) {
+        fileNameDisplay.innerText = `📄 ${file.name}`;
+        fileInfo.classList.remove('hidden');
+        dropzoneText.classList.add('opacity-30');
+      } else {
+        alert('Please upload a valid ZIP file');
+        fileInput.value = '';
+      }
+    }
+
+    fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
+
+    dropzone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropzone.classList.add('border-blue-500', 'bg-blue-50');
+    });
+
+    dropzone.addEventListener('dragleave', () => {
+      dropzone.classList.remove('border-blue-500', 'bg-blue-50');
+    });
+
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('border-blue-500', 'bg-blue-50');
+      const file = e.dataTransfer.files[0];
+      fileInput.files = e.dataTransfer.files;
+      handleFile(file);
+    });
+
+    const form = document.querySelector('form');
+    const submitBtn = form.querySelector('button');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const originalText = submitBtn.innerText;
+      submitBtn.disabled = true;
+      submitBtn.classList.replace('bg-blue-600', 'bg-gray-400');
+
+      let timeLeft = 60; // Ditingkatkan ke 60 detik karena memproses banyak file
+      submitBtn.innerText = `Processing Batch... ${timeLeft}s`;
+      
+      const countdownInterval = setInterval(() => {
+        timeLeft--;
+        if (timeLeft > 0) {
+          submitBtn.innerText = `Processing Batch... ${timeLeft}s`;
+        } else {
+          submitBtn.innerText = `Finishing up...`;
+        }
+      }, 1000);
+
+      const formData = new FormData(form);
+
+      try {
+        const response = await fetch(form.action, {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!response.ok) throw new Error('Gagal memproses batch visa');
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Processed_Visa_Docs.zip`;
+        document.body.appendChild(a);
+        a.click();
+
+        window.URL.revokeObjectURL(url);
+        alert('Success! Batch processing complete. Your files are downloading.');
+
+      } catch (error) {
+        console.error(error);
+        alert('Error: ' + error.message);
+      } finally {
+        clearInterval(countdownInterval);
+        submitBtn.innerText = originalText;
+        submitBtn.disabled = false;
+        submitBtn.classList.replace('bg-gray-400', 'bg-blue-600');
+      }
+    });
   </script>
 
 </body>

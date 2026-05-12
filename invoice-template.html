@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Invoice Generator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #0a1b52;
+      --accent: #22bfc0;
+      --accent-light: #22bfc0;
+      --muted: #727272;
+      --border: #22bfc0;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background-color: var(--paper);
+      color: var(--ink);
+      min-height: 100vh;
+    }
+
+    .serif { font-family: 'DM Serif Display', serif; }
+    .mono { font-family: 'DM Mono', monospace; }
+
+    .section-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      box-shadow: 4px 4px 0px var(--border);
+    }
+
+    .section-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .input-field {
+      width: 100%;
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      padding: 0.55rem 0.75rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      color: var(--ink);
+      transition: border-color 0.15s, box-shadow 0.15s;
+      outline: none;
+    }
+
+    .input-field:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-light);
+    }
+
+    .input-field::placeholder { color: var(--muted); }
+
+    select.input-field {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238a8278' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      padding-right: 2rem;
+    }
+
+    .input-label {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--muted);
+      margin-bottom: 0.3rem;
+      display: block;
+    }
+
+    .btn-primary {
+      background: var(--ink);
+      color: #fff;
+      border: none;
+      padding: 0.55rem 1.25rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      border-radius: 2px;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    .btn-primary:hover { background: var(--accent); }
+    .btn-primary:active { transform: scale(0.98); }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      padding: 0.45rem 1rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      border-radius: 2px;
+      transition: all 0.15s;
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--ink);
+      color: var(--ink);
+    }
+
+    .btn-danger {
+      background: transparent;
+      color: #c0392b;
+      border: 1px solid #f0c8c4;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 2px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+      transition: all 0.15s;
+    }
+
+    .btn-danger:hover {
+      background: #fff0ef;
+      border-color: #c0392b;
+    }
+
+    .product-row {
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      padding: 1rem;
+      background: var(--paper);
+      position: relative;
+      animation: slideIn 0.2s ease;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .doc-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: var(--cream);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      padding: 0.3rem 0.6rem;
+      font-size: 0.78rem;
+      color: var(--ink);
+      animation: tagIn 0.18s ease;
+    }
+
+    @keyframes tagIn {
+      from { opacity: 0; scale: 0.92; }
+      to { opacity: 1; scale: 1; }
+    }
+
+    .doc-tag button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      transition: color 0.1s;
+    }
+
+    .doc-tag button:hover { color: var(--accent); }
+
+    .loading-dots::after {
+      content: '';
+      animation: dots 1.2s steps(3, end) infinite;
+    }
+
+    @keyframes dots {
+      0%   { content: ''; }
+      33%  { content: '.'; }
+      66%  { content: '..'; }
+      100% { content: '...'; }
+    }
+
+    .price-display {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.85rem;
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+    }
+
+    .header-rule {
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent) 0%, var(--ink) 100%);
+    }
+  </style>
+</head>
+<body class="py-10 px-4">
+
+  <!-- Header -->
+  <div class="max-w-3xl mx-auto mb-8">
+    <div class="header-rule mb-5"></div>
+    <div class="flex items-end justify-between">
+      <div>
+        <p class="section-label mb-1">Visaloka</p>
+        <h1 class="serif text-4xl text-gray-900">Invoice Generator</h1>
+      </div>
+      <p class="mono text-xs text-gray-400">v1.0</p>
+    </div>
+  </div>
+
+  <div class="max-w-3xl mx-auto space-y-6">
+
+    <!-- Section 1: Bill To -->
+    <div class="section-card p-6">
+      <p class="section-label mb-4">01 — Bill To</p>
+      <div class="space-y-4">
+        <div>
+          <label class="input-label">Full Name</label>
+          <input type="text" id="billName" class="input-field" placeholder="e.g. John Doe" />
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="input-label">Phone Number</label>
+            <input type="tel" id="billPhone" class="input-field" placeholder="+62 8xx xxxx xxxx" />
+          </div>
+          <div>
+            <label class="input-label">Company Name</label>
+            <input type="text" id="billCompany" class="input-field" placeholder="e.g. PT Visaloka" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 2: Product Information -->
+    <div class="section-card p-6">
+      <div class="flex items-center justify-between mb-4">
+        <p class="section-label">02 — Product Information</p>
+        <button class="btn-ghost" onclick="addProductRow()">+ Add Product</button>
+      </div>
+
+      <div id="productList" class="space-y-3"></div>
+
+      <!-- Grand Total -->
+      <div class="divider mt-5 mb-4"></div>
+      <div class="flex justify-end items-center gap-4">
+        <span class="mono text-xs text-gray-400 uppercase tracking-widest">Grand Total</span>
+        <span id="grandTotal" class="serif text-2xl text-gray-900">Rp 0</span>
+      </div>
+    </div>
+
+    <!-- Section 3: Required Documents -->
+    <div class="section-card p-6">
+      <p class="section-label mb-4">03 — Required Documents</p>
+
+      <!-- Document Tags -->
+      <div id="documentList" class="flex flex-wrap gap-2 min-h-[2rem] mb-4">
+        <p id="docPlaceholder" class="text-xs text-gray-400 italic mt-1">Documents will appear here when you select a product above.</p>
+      </div>
+
+      <div class="divider mb-4"></div>
+
+      <!-- Add Custom Document -->
+      <div class="flex gap-2">
+        <input type="text" id="customDocInput" class="input-field" placeholder="Add custom document..." style="flex:1" />
+        <button class="btn-primary" onclick="addCustomDocument()">Add</button>
+      </div>
+    </div>
+
+    <!-- Submit -->
+    <div class="flex justify-end pb-6">
+      <button  class="btn-primary" style="padding: 0.75rem 2rem; font-size: 0.8rem;" onclick="submitInvoice()">
+        Generate Invoice →
+      </button>
+    </div>
+
+  </div>
+
+<script>
+  // ─── State ───────────────────────────────────────────────
+  let allProducts = [];
+  let productRows = [];
+  let documents = new Set(); // unique doc names
+  let rowCounter = 0;
+
+  // ─── Init ─────────────────────────────────────────────────
+  async function init() {
+    await fetchProducts();
+    addProductRow();
+  }
+
+  // ─── Fetch all products ───────────────────────────────────
+  async function fetchProducts() {
+    try {
+      const res = await fetch('https://api.visaloka.com/v1/product?page=1&limit=100');
+      const json = await res.json();
+      allProducts = json.data || [];
+    } catch (e) {
+      console.error('Failed to fetch products:', e);
+      allProducts = [];
+    }
+  }
+
+  // ─── Add product row ──────────────────────────────────────
+  function addProductRow() {
+    const id = ++rowCounter;
+    productRows.push(id);
+
+    const container = document.getElementById('productList');
+    const div = document.createElement('div');
+    div.className = 'product-row';
+    div.id = `row-${id}`;
+
+    div.innerHTML = `
+      <div class="flex items-start gap-3">
+        <div style="flex:1" class="space-y-3">
+          <!-- Product Select -->
+          <div>
+            <label class="input-label">Product</label>
+            <select class="input-field" id="select-${id}" onchange="onProductSelect(${id})">
+              <option value="">— Select product —</option>
+              ${allProducts.map(p => `<option value="${p.slug}" data-name="${escapeAttr(p.name)}" data-price="${p.price}">${p.name}</option>`).join('')}
+            </select>
+          </div>
+
+          <!-- Detail fields (hidden until selected) -->
+          <div id="detail-${id}" class="hidden grid grid-cols-3 gap-3">
+            <div style="grid-column: span 1">
+              <label class="input-label">Product Name</label>
+              <input type="text" id="pname-${id}" class="input-field" placeholder="Product name" />
+            </div>
+            <div>
+              <label class="input-label">Price (Rp)</label>
+              <input type="number" id="price-${id}" class="input-field price-display" placeholder="0" oninput="updateTotal()" />
+            </div>
+            <div>
+              <label class="input-label">Quantity</label>
+              <input type="number" id="qty-${id}" class="input-field price-display" value="1" min="1" oninput="updateTotal()" />
+            </div>
+          </div>
+
+          <!-- Loading indicator -->
+          <p id="loading-${id}" class="hidden text-xs text-gray-400 mono loading-dots">Fetching documents</p>
+        </div>
+
+        <!-- Remove button (hidden if only 1 row) -->
+        <button class="btn-danger mt-6" id="remove-${id}" onclick="removeProductRow(${id})" title="Remove">✕</button>
+      </div>
+    `;
+
+    container.appendChild(div);
+    updateRemoveButtons();
+  }
+
+  // ─── Remove product row ───────────────────────────────────
+  function removeProductRow(id) {
+    if (productRows.length <= 1) return;
+    const el = document.getElementById(`row-${id}`);
+    if (el) el.remove();
+    productRows = productRows.filter(r => r !== id);
+    updateRemoveButtons();
+    updateTotal();
+    rebuildDocuments();
+  }
+
+  function updateRemoveButtons() {
+    productRows.forEach(id => {
+      const btn = document.getElementById(`remove-${id}`);
+      if (btn) btn.style.visibility = productRows.length <= 1 ? 'hidden' : 'visible';
+    });
+  }
+
+  // ─── On product selected ──────────────────────────────────
+  async function onProductSelect(id) {
+    const sel = document.getElementById(`select-${id}`);
+    const opt = sel.selectedOptions[0];
+    const detailDiv = document.getElementById(`detail-${id}`);
+    const loadingEl = document.getElementById(`loading-${id}`);
+
+    if (!sel.value) {
+      detailDiv.classList.add('hidden');
+      rebuildDocuments();
+      return;
+    }
+
+    const name = opt.getAttribute('data-name');
+    const price = opt.getAttribute('data-price');
+    const slug = sel.value;
+
+    // Fill fields
+    document.getElementById(`pname-${id}`).value = name;
+    document.getElementById(`price-${id}`).value = price;
+    document.getElementById(`qty-${id}`).value = 1;
+    detailDiv.classList.remove('hidden');
+    updateTotal();
+
+    // Fetch product detail for documents
+    loadingEl.classList.remove('hidden');
+    try {
+      const res = await fetch(`https://api.visaloka.com/v1/product/${slug}`);
+      const json = await res.json();
+      const docs = json?.data?.productDocumentRules || [];
+      // Store docs on element for rebuildDocuments
+      sel.setAttribute('data-docs', JSON.stringify(docs.map(d => d.name || d.documentName)));
+    } catch (e) {
+      console.error('Failed to fetch product detail:', e);
+      sel.setAttribute('data-docs', '[]');
+    } finally {
+      loadingEl.classList.add('hidden');
+    }
+
+    rebuildDocuments();
+  }
+
+  // ─── Rebuild unique documents from all selected products ──
+  function rebuildDocuments() {
+    const collected = new Set();
+
+    // Collect from all product selects
+    productRows.forEach(id => {
+      const sel = document.getElementById(`select-${id}`);
+      if (!sel || !sel.value) return;
+      try {
+        const docs = JSON.parse(sel.getAttribute('data-docs') || '[]');
+        docs.forEach(d => collected.add(d));
+      } catch {}
+    });
+
+    // Keep manually added docs that aren't from product fetch
+    // (preserve custom ones user added)
+    documents.forEach(d => collected.add(d));
+    documents = collected;
+
+    renderDocuments();
+  }
+
+  // ─── Render document tags ─────────────────────────────────
+  function renderDocuments() {
+    const container = document.getElementById('documentList');
+    const placeholder = document.getElementById('docPlaceholder');
+
+    container.innerHTML = '';
+
+    if (documents.size === 0) {
+      container.appendChild(createPlaceholder());
+      return;
+    }
+
+    documents.forEach(docName => {
+      const tag = document.createElement('div');
+      tag.className = 'doc-tag';
+      tag.innerHTML = `
+        <span>${escapeHtml(docName)}</span>
+        <button onclick="removeDocument('${escapeAttr(docName)}')" title="Remove">✕</button>
+      `;
+      container.appendChild(tag);
+    });
+  }
+
+  function createPlaceholder() {
+    const p = document.createElement('p');
+    p.className = 'text-xs text-gray-400 italic mt-1';
+    p.textContent = 'Documents will appear here when you select a product above.';
+    return p;
+  }
+
+  // ─── Remove a document ───────────────────────────────────
+  function removeDocument(name) {
+    documents.delete(name);
+    renderDocuments();
+  }
+
+  // ─── Add custom document ──────────────────────────────────
+  function addCustomDocument() {
+    const input = document.getElementById('customDocInput');
+    const val = input.value.trim();
+    if (!val) return;
+    documents.add(val);
+    renderDocuments();
+    input.value = '';
+    input.focus();
+  }
+
+  // Allow Enter key on custom doc input
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('customDocInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') addCustomDocument();
+    });
+  });
+
+  // ─── Update grand total ───────────────────────────────────
+  function updateTotal() {
+    let total = 0;
+    productRows.forEach(id => {
+      const price = parseFloat(document.getElementById(`price-${id}`)?.value) || 0;
+      const qty = parseFloat(document.getElementById(`qty-${id}`)?.value) || 0;
+      total += price * qty;
+    });
+    document.getElementById('grandTotal').textContent = formatRupiah(total);
+  }
+
+  // ─── Collect form data ────────────────────────────────────
+  function collectData() {
+    const billTo = {
+      name: document.getElementById('billName').value,
+      phone: document.getElementById('billPhone').value,
+      company: document.getElementById('billCompany').value,
+    };
+
+    const products = productRows.map(id => {
+      const sel = document.getElementById(`select-${id}`);
+      return {
+        productSlug: sel?.value || '',
+        productName: document.getElementById(`pname-${id}`)?.value || '',
+        price: parseFloat(document.getElementById(`price-${id}`)?.value) || 0,
+        quantity: parseInt(document.getElementById(`qty-${id}`)?.value) || 0,
+      };
+    }).filter(p => p.productSlug);
+
+    const requiredDocuments = Array.from(documents);
+
+    return { billTo, products, requiredDocuments };
+  }
+
+
+  async function submitInvoice() {
+    console.log(collectData())
+    try {
+      const response = await fetch("http://localhost:5678/webhook-test/0df9f1ee-d28d-421e-80e0-86e3a89df69f", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(collectData()),
+      });
+  
+      if (!response.ok) throw new Error('Gagal membuat invoice');
+      
+    } catch (error) {
+      console.error(error);
+      alert('Error: ' + error.message);
+    }
+  }
+
+  
+  // ─── Helpers ──────────────────────────────────────────────
+  function formatRupiah(n) {
+    return 'Rp ' + Math.round(n).toLocaleString('id-ID');
+  }
+
+  function escapeHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function escapeAttr(str) {
+    return str.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+  }
+
+  // ─── Start ────────────────────────────────────────────────
+  init();
+</script>
+</body>
+</html>
