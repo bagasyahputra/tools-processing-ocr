@@ -250,13 +250,11 @@ form.addEventListener('submit', async (e) => {
       </label>
       <select 
         name="visa_type"
+        id="visa_type_select"
         required
         class="w-full border border-gray-300 rounded-xl p-3 focus:ring-2 focus:ring-blue-500"
       >
-        <option value="">Select Visa Type</option>
-        <option value="Single Entry C14">Single Entry C14</option>
-        <option value="Multiple Entry C14">Multiple Entry C14</option>
-        <option value="Single Entry Exhibition Visa C11">Single Entry Exhibitor Visa C11</option>
+        <option value="">Loading Visa Types...</option>
       </select>
     </div>
     
@@ -283,6 +281,37 @@ form.addEventListener('submit', async (e) => {
   </form>
 
   <script>
+     let allProducts = [];
+    // ─── Init ─────────────────────────────────────────────────
+    async function init() {
+      await fetchProducts();
+      populateVisaTypes();
+    }
+
+    function populateVisaTypes() {
+      const select = document.getElementById('visa_type_select');
+      if (!select) return;
+      
+      select.innerHTML = '<option value="">Select Visa Type</option>';
+      allProducts.forEach(p => {
+        const option = document.createElement('option');
+        option.value = p.name;
+        option.textContent = p.name;
+        select.appendChild(option);
+      });
+    }
+
+    async function fetchProducts() {
+    try {
+      const res = await fetch('https://api.visaloka.com/v1/product?page=1&limit=100');
+      const json = await res.json();
+      allProducts = json.data || [];
+    } catch (e) {
+      console.error('Failed to fetch products:', e);
+      allProducts = [];
+    }
+  }
+
     const dropzone = document.getElementById('dropzone');
     const fileInput = document.getElementById('fileInput');
     const fileInfo = document.getElementById('file-info');
@@ -374,6 +403,8 @@ form.addEventListener('submit', async (e) => {
         submitBtn.classList.replace('bg-gray-400', 'bg-blue-600');
       }
     });
+    // ─── Start ────────────────────────────────────────────────
+    init();
   </script>
 
 </body>
