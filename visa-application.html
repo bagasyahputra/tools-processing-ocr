@@ -208,18 +208,19 @@ form.addEventListener('submit', async (e) => {
       Tools OCR Passport (Batch ZIP)
     </h2>
 
-    <div>
-      <label class="block text-sm font-medium text-gray-600 mb-2">
-        Surat ditujukan kepada:
-      </label>
-      <input 
-        type="text"
-        name="addressed_to"
-        placeholder="Contoh: Direktorat Jenderal Imigrasi"
-        required
-        class="w-full border border-gray-300 rounded-xl p-3 focus:ring-2 focus:ring-blue-500"
-      />
-    </div>
+   <div>
+  <label class="block text-sm font-medium text-gray-600 mb-2">
+    Surat ditujukan kepada:
+  </label>
+  <textarea
+    name="addressed_to"
+    placeholder="Contoh: Direktorat Jenderal Imigrasi"
+    required
+    rows="3"
+    class="w-full border border-gray-300 rounded-xl p-3 focus:ring-2 focus:ring-blue-500 resize-y"
+  ></textarea>
+</div>
+
 
     <div 
       id="dropzone"
